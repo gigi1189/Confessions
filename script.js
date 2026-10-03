@@ -1,4 +1,4 @@
-const SHEET_ID = "1hCAgccyM-YNTppvaUAKmVtNcN8BOyOs-z71IYx7nx70";
+const SHEET_ID = "1AEc_AqgK8Sz8wFjseqi62ljDHPB9T3Fvm809B5eRVlI";
 const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/1`;
 
 let rawConfessions = [];
@@ -12,7 +12,8 @@ async function fetchConfessions() {
 
     if (Array.isArray(data) && data.length > 0) {
       const keys = Object.keys(data[0]);
-      const targetColumnKey = keys.length > 1 ? keys[1] : keys[0];
+      
+      const targetColumnKey = keys[0];
 
       const extracted = data
         .map(row => row[targetColumnKey])
@@ -24,7 +25,7 @@ async function fetchConfessions() {
         reshuffleDeck();
       }
 
-      console.log(`Loaded ${rawConfessions.length} unique confessions:`, rawConfessions);
+      console.log(`Loaded ${rawConfessions.length} unique confessions from ${targetColumnKey}:`, rawConfessions);
     }
   } catch (err) {
     console.error("Error fetching sheet data:", err);
