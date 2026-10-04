@@ -21,8 +21,8 @@ html, body{
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Dead center vertically */
-  align-items: center;     /* Dead center horizontally */
+  justify-content: center; 
+  align-items: center;   
   padding: 2rem;
   box-sizing: border-box;
 }
@@ -31,7 +31,7 @@ html, body{
     text-align: center;
     font-size: 3em;
     letter-spacing: 5px;
-    Width: 100%;
+    width: 100%;
     transition: opacity 0.6s ease-in-out; 
     opacity: 1;
     text-shadow: 

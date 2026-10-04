@@ -1,7 +1,5 @@
-// 1. Check if we already have a Sheet ID saved in local storage
 let savedSheetId = localStorage.getItem("user_sheet_id");
 
-// 2. If no saved ID exists, prompt for it
 if (!savedSheetId) {
   const userInput = prompt("Enter your Google Sheet URL below. (NOTE: Please ensure cell A1 contains a title, such as 'Confessions', and that the access to the sheet is public. :3)");
   
@@ -10,7 +8,6 @@ if (!savedSheetId) {
       ? userInput.split("/d/")[1].split("/")[0]
       : userInput.trim();
 
-    // Store it so we don't ask again
     localStorage.setItem("user_sheet_id", savedSheetId);
   }
 }
@@ -45,14 +42,12 @@ async function fetchConfessions() {
         reshuffleDeck();
       }
 
-      console.log(`Loaded ${rawConfessions.length} confessions:`, rawConfessions);
     }
   } catch (err) {
     console.error("Error fetching sheet data:", err);
   }
 }
 
-// Fisher-Yates Deck Shuffle
 function reshuffleDeck() {
   const lastShown = shuffledDeck[deckIndex - 1];
   shuffledDeck = [...rawConfessions];
