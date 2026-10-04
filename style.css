@@ -5,20 +5,33 @@
     font-style: italic;
         }
 
-body{
+html, body{
     color:white;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
     background-color:black;
     font-family: 'ChapbookItalic', sans-serif;
-    overflow-y: hidden;
+    overflow: hidden;
+}
+
+.app-container {
+  width: 100vw;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Dead center vertically */
+  align-items: center;     /* Dead center horizontally */
+  padding: 2rem;
+  box-sizing: border-box;
 }
 
 #confession-box{
     text-align: center;
     font-size: 3em;
     letter-spacing: 5px;
-    Width: 50%;
-    margin: 10% auto;
-    padding: 10%;
+    Width: 100%;
     transition: opacity 0.6s ease-in-out; 
     opacity: 1;
     text-shadow: 

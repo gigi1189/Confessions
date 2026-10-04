@@ -1,4 +1,21 @@
-const SHEET_ID = "1AEc_AqgK8Sz8wFjseqi62ljDHPB9T3Fvm809B5eRVlI";
+// 1. Check if we already have a Sheet ID saved in local storage
+let savedSheetId = localStorage.getItem("user_sheet_id");
+
+// 2. If no saved ID exists, prompt for it
+if (!savedSheetId) {
+  const userInput = prompt("Enter your Google Sheet URL below. (NOTE: Please ensure cell A1 contains a title, such as 'Confessions', and that the access to the sheet is public. :3)");
+  
+  if (userInput) {
+    savedSheetId = userInput.includes("/d/")
+      ? userInput.split("/d/")[1].split("/")[0]
+      : userInput.trim();
+
+    // Store it so we don't ask again
+    localStorage.setItem("user_sheet_id", savedSheetId);
+  }
+}
+
+const SHEET_ID = savedSheetId;
 const API_URL = `https://opensheet.elk.sh/${SHEET_ID}/1`;
 
 let rawConfessions = [];
@@ -6,17 +23,20 @@ let shuffledDeck = [];
 let deckIndex = 0;
 
 async function fetchConfessions() {
+  if (!SHEET_ID) {
+    console.warn("No Google Sheet ID provided!");
+    return;
+  }
+
   try {
     const response = await fetch(API_URL);
     const data = await response.json();
 
     if (Array.isArray(data) && data.length > 0) {
-      const keys = Object.keys(data[0]);
-      
-      const targetColumnKey = keys[0];
+      const columnHeader = Object.keys(data[0])[0];
 
       const extracted = data
-        .map(row => row[targetColumnKey])
+        .map(row => row[columnHeader])
         .filter(text => text && String(text).trim() !== "");
 
       rawConfessions = [...new Set(extracted)];
@@ -25,15 +45,16 @@ async function fetchConfessions() {
         reshuffleDeck();
       }
 
-      console.log(`Loaded ${rawConfessions.length} unique confessions from ${targetColumnKey}:`, rawConfessions);
+      console.log(`Loaded ${rawConfessions.length} confessions:`, rawConfessions);
     }
   } catch (err) {
     console.error("Error fetching sheet data:", err);
   }
 }
 
+// Fisher-Yates Deck Shuffle
 function reshuffleDeck() {
-  const lastShown = shuffledDeck[deckIndex - 1]; 
+  const lastShown = shuffledDeck[deckIndex - 1];
   shuffledDeck = [...rawConfessions];
 
   for (let i = shuffledDeck.length - 1; i > 0; i--) {
@@ -42,7 +63,10 @@ function reshuffleDeck() {
   }
 
   if (shuffledDeck.length > 1 && shuffledDeck[0] === lastShown) {
-    [shuffledDeck[0], shuffledDeck[shuffledDeck.length - 1]] = [shuffledDeck[shuffledDeck.length - 1], shuffledDeck[0]];
+    [shuffledDeck[0], shuffledDeck[shuffledDeck.length - 1]] = [
+      shuffledDeck[shuffledDeck.length - 1],
+      shuffledDeck[0]
+    ];
   }
 
   deckIndex = 0;
@@ -61,23 +85,28 @@ function getNextConfession() {
 }
 
 function showNextConfession() {
-  const box = document.getElementById("ConfessionBox") || document.getElementById("confession-box");
+  const box = document.getElementById("confession-box") || document.getElementById("ConfessionBox");
   if (!box || rawConfessions.length === 0) return;
 
   box.classList.add("fade-out");
 
   setTimeout(() => {
     const nextText = getNextConfession();
-    box.textContent = `"${nextText} "`;
+    box.textContent = `"${nextText}"`;
 
     box.classList.remove("fade-out");
   }, 600);
 }
 
 async function initLoop() {
-  await fetchConfessions();
+  const box = document.getElementById("confession-box") || document.getElementById("ConfessionBox");
 
-  const box = document.getElementById("ConfessionBox") || document.getElementById("confession-box");
+  if (!SHEET_ID) {
+    if (box) box.textContent = "Please refresh to enter a valid Google Sheet ID.";
+    return;
+  }
+
+  await fetchConfessions();
 
   if (rawConfessions.length > 0) {
     showNextConfession();
